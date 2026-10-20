@@ -1,0 +1,43 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: arena
+      POSTGRES_USER: arena
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-arena}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U arena -d arena"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build: ./backend
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/arena
+      DB_USER: arena
+      DB_PASSWORD: ${DB_PASSWORD:-arena}
+      JWT_SECRET: ${JWT_SECRET:-dev-only-secret-change-me-dev-only-secret-change-me}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
+      SPORTMONKS_API_TOKEN: ${SPORTMONKS_API_TOKEN:-}
+      SPORTMONKS_BASE_URL: ${SPORTMONKS_BASE_URL:-https://api.sportmonks.com/v3/football}
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+
+volumes:
+  pgdata:

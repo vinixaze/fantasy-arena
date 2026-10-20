@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/arena}
+    username: ${DB_USER:arena}
+    password: ${DB_PASSWORD:arena}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
+
+server:
+  error:
+    include-message: always
+
+arena:
+  jwt:
+    secret: ${JWT_SECRET:dev-only-secret-change-me-dev-only-secret-change-me}
+    expiration-hours: 72
+  sync:
+    interval-ms: 3600000
+  admin:
+    username: ${ADMIN_USERNAME:}
+    password: ${ADMIN_PASSWORD:}
+  sportmonks:
+    token: ${SPORTMONKS_API_TOKEN:}
+    base-url: ${SPORTMONKS_BASE_URL:https://api.sportmonks.com/v3/football}
